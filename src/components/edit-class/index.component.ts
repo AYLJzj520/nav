@@ -4,8 +4,11 @@
 
 import {
   Component,
+  Input,
+  OnChanges,
   Output,
   EventEmitter,
+  SimpleChanges,
   ViewChild,
   ElementRef,
 } from '@angular/core'
@@ -48,7 +51,9 @@ import event from 'src/utils/mitt'
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.scss'],
 })
-export class EditClassComponent {
+export class EditClassComponent implements OnChanges {
+  @Input() initialEditClass: { id: number; props: any } | null = null
+  @Output() ready = new EventEmitter<void>()
   @Output() onOk = new EventEmitter()
   @ViewChild('input', { static: false }) input!: ElementRef
 
@@ -68,16 +73,29 @@ export class EditClassComponent {
       ownVisible: [false],
       id: [-1],
     })
-    const handleOpen = (props: any = {}) => {
-      this.isEdit = !!props['title']
-      this.validateForm.get('title')!.setValue(props['title'] || '')
-      this.validateForm.get('icon')!.setValue(props['icon'] || '')
-      this.validateForm.get('id')!.setValue(props['id'] || getTempId())
-      this.validateForm.get('ownVisible')!.setValue(!!props['ownVisible'])
-      this.showModal = true
-      this.focusUrl()
+    event.on('EDIT_CLASS_OPEN', (props: any = {}) => {
+      this.open(props)
+    })
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['initialEditClass'] && this.initialEditClass) {
+      this.open(this.initialEditClass.props)
     }
-    event.on('EDIT_CLASS_OPEN', handleOpen)
+  }
+
+  ngOnInit() {
+    this.ready.emit()
+  }
+
+  private open(props: any = {}) {
+    this.isEdit = !!props['title']
+    this.validateForm.get('title')!.setValue(props['title'] || '')
+    this.validateForm.get('icon')!.setValue(props['icon'] || '')
+    this.validateForm.get('id')!.setValue(props['id'] || getTempId())
+    this.validateForm.get('ownVisible')!.setValue(!!props['ownVisible'])
+    this.showModal = true
+    this.focusUrl()
   }
 
   get iconUrl(): string {

@@ -8,11 +8,35 @@
 
     <router-outlet></router-outlet>
 
-    @defer (on idle) {
-      <app-create-web />
-      <app-delete-modal />
-      <app-move-web *ngIf="isLogin" />
-      <edit-class *ngIf="isLogin" />
+    @defer (when createWebLoaded) {
+      <app-create-web
+        [initialCreateWeb]="pendingCreateWeb"
+        [initialSetCreateWeb]="pendingSetCreateWeb"
+        (ready)="createWebReady = true"
+      />
+    }
+
+    @defer (when deleteModalLoaded) {
+      <app-delete-modal
+        [initialDeleteModal]="pendingDeleteModal"
+        (ready)="deleteModalReady = true"
+      />
+    }
+
+    @defer (when moveWebLoaded) {
+      <app-move-web
+        *ngIf="isLogin"
+        [initialMoveWeb]="pendingMoveWeb"
+        (ready)="moveWebReady = true"
+      />
+    }
+
+    @defer (when editClassLoaded) {
+      <edit-class
+        *ngIf="isLogin"
+        [initialEditClass]="pendingEditClass"
+        (ready)="editClassReady = true"
+      />
     }
   </div>
 </ng-template>

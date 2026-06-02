@@ -2,7 +2,14 @@
 // Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
 
-import { Component } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { CommonModule } from '@angular/common'
 import { $t } from 'src/locale'
@@ -31,7 +38,17 @@ import event from 'src/utils/mitt'
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.scss'],
 })
-export class MoveWebComponent {
+export class MoveWebComponent implements OnChanges {
+  @Input() initialMoveWeb: {
+    id: number
+    props: {
+      id?: number
+      level?: number
+      data: IWebProps[]
+    }
+  } | null = null
+  @Output() ready = new EventEmitter<void>()
+
   readonly $t = $t
   readonly navs = navs
   twoOptions: INavTwoProp[] = []
@@ -52,7 +69,15 @@ export class MoveWebComponent {
     })
   }
 
-  ngOnInit() {}
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['initialMoveWeb'] && this.initialMoveWeb) {
+      this.open(this, this.initialMoveWeb.props)
+    }
+  }
+
+  ngOnInit() {
+    this.ready.emit()
+  }
 
   open(
     ctx: this,

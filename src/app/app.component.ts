@@ -58,6 +58,19 @@ import { filter } from 'rxjs/operators'
 export class AppComponent {
   readonly isLogin: boolean = isLogin
   fetchIng = true
+  createWebLoaded = false
+  deleteModalLoaded = false
+  moveWebLoaded = false
+  editClassLoaded = false
+  createWebReady = false
+  deleteModalReady = false
+  moveWebReady = false
+  editClassReady = false
+  pendingCreateWeb: { id: number; props: any } | null = null
+  pendingSetCreateWeb: { id: number; props: any } | null = null
+  pendingDeleteModal: { id: number; props: any } | null = null
+  pendingMoveWeb: { id: number; props: any } | null = null
+  pendingEditClass: { id: number; props: any } | null = null
 
   constructor(
     private router: Router,
@@ -107,6 +120,51 @@ export class AppComponent {
   }
 
   private registerEvents() {
+    event.on('CREATE_WEB', (props: any) => {
+      if (this.createWebReady) return
+      this.createWebLoaded = true
+      this.pendingCreateWeb = {
+        id: Date.now(),
+        props,
+      }
+    })
+
+    event.on('SET_CREATE_WEB', (props: any) => {
+      if (this.createWebReady) return
+      this.createWebLoaded = true
+      this.pendingSetCreateWeb = {
+        id: Date.now(),
+        props,
+      }
+    })
+
+    event.on('DELETE_MODAL', (props: any) => {
+      if (this.deleteModalReady) return
+      this.deleteModalLoaded = true
+      this.pendingDeleteModal = {
+        id: Date.now(),
+        props,
+      }
+    })
+
+    event.on('MOVE_WEB', (props: any) => {
+      if (this.moveWebReady) return
+      this.moveWebLoaded = true
+      this.pendingMoveWeb = {
+        id: Date.now(),
+        props,
+      }
+    })
+
+    event.on('EDIT_CLASS_OPEN', (props: any) => {
+      if (this.editClassReady) return
+      this.editClassLoaded = true
+      this.pendingEditClass = {
+        id: Date.now(),
+        props,
+      }
+    })
+
     event.on('MESSAGE', (props: any) => {
       // @ts-ignore
       this.message[props.type](props.content)

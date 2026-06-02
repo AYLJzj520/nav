@@ -294,6 +294,8 @@ interface SEOPayload {
   settings: ISettings
 }
 
+const SEO_MAX_ITEMS = 200
+
 export function writeSEO(navs: INavProps[], payload: SEOPayload): string {
   const { settings } = payload
   const nowDate = dayjs.tz().format('YYYY-MM-DD HH:mm:ss')
@@ -302,12 +304,15 @@ export function writeSEO(navs: INavProps[], payload: SEOPayload): string {
 `
 
   if (settings.openSEO) {
+    let count = 0
     dfsNavs({
       navs,
       webCallback: (web: IWebProps) => {
-        seoTemplate += `<div>${web.name}</div>${
-          web.desc ? `<p>${web.desc}</p>` : ''
-        }`
+        if (count >= SEO_MAX_ITEMS) {
+          return
+        }
+        seoTemplate += `<div>${web.name}</div>`
+        count += 1
       },
     })
   }

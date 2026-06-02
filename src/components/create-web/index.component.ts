@@ -4,6 +4,11 @@
 
 import {
   Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
   ViewChild,
   ViewChildren,
   QueryList,
@@ -74,7 +79,10 @@ import event from 'src/utils/mitt'
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.scss'],
 })
-export class CreateWebComponent {
+export class CreateWebComponent implements OnChanges {
+  @Input() initialCreateWeb: { id: number; props: any } | null = null
+  @Input() initialSetCreateWeb: { id: number; props: any } | null = null
+  @Output() ready = new EventEmitter<void>()
   @ViewChildren('inputs') inputs!: QueryList<ElementRef>
   @ViewChild('inputUrl', { static: false }) inputUrlRef!: ElementRef
   @ViewChild('inputTitle') inputTitleRef!: ElementRef
@@ -132,6 +140,22 @@ export class CreateWebComponent {
       img: [''],
       urlArr: this.fb.array([]),
     })
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['initialCreateWeb'] && this.initialCreateWeb) {
+      this.open(this, this.initialCreateWeb.props)
+    }
+    if (changes['initialSetCreateWeb'] && this.initialSetCreateWeb) {
+      for (const k in this.initialSetCreateWeb.props) {
+        // @ts-ignore
+        this[k] = this.initialSetCreateWeb.props[k]
+      }
+    }
+  }
+
+  ngOnInit() {
+    this.ready.emit()
   }
 
   get modalTitle(): string {

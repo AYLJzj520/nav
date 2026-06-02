@@ -1,7 +1,14 @@
 // 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
 // Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
-import { Component } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import type { IWebProps, INavProps } from 'src/types'
@@ -34,7 +41,10 @@ interface Props {
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.scss'],
 })
-export class DeleteModalComponent {
+export class DeleteModalComponent implements OnChanges {
+  @Input() initialDeleteModal: { id: number; props: Props } | null = null
+  @Output() ready = new EventEmitter<void>()
+
   readonly $t = $t
 
   submitting = false
@@ -48,14 +58,27 @@ export class DeleteModalComponent {
 
   constructor(private message: NzMessageService) {
     event.on('DELETE_MODAL', (props: unknown) => {
-      const p = props as Props
-      this.ids = p.ids
-      this.isClass = p.isClass || false
-      this.data = p.data
-      this.showModal = true
-      this.onOk = p.onOk
-      this.onComplete = p.onComplete
+      this.open(props as Props)
     })
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['initialDeleteModal'] && this.initialDeleteModal) {
+      this.open(this.initialDeleteModal.props)
+    }
+  }
+
+  ngOnInit() {
+    this.ready.emit()
+  }
+
+  private open(props: Props) {
+    this.ids = props.ids
+    this.isClass = props.isClass || false
+    this.data = props.data
+    this.showModal = true
+    this.onOk = props.onOk
+    this.onComplete = props.onComplete
   }
 
   handleCancel() {
