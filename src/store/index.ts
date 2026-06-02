@@ -47,6 +47,17 @@ export const navs = signal<INavProps[]>([])
 
 let staticNavsPromise: Promise<INavProps[]> | null = null
 
+async function parseStaticNavs(text: string): Promise<INavProps[]> {
+  try {
+    return JSON.parse(text) as INavProps[]
+  } catch {}
+
+  const module = await import('lz-string')
+  const LZString = module.default
+  const json = LZString.decompressFromBase64(text.trim())
+  return json ? (JSON.parse(json) as INavProps[]) : []
+}
+
 export function loadStaticNavs(): Promise<INavProps[]> {
   if (isSelfDevelop) {
     return Promise.resolve([])
@@ -55,7 +66,8 @@ export function loadStaticNavs(): Promise<INavProps[]> {
     return Promise.resolve(navs())
   }
   staticNavsPromise ||= fetch(DB_PATH)
-    .then((res) => res.json() as Promise<INavProps[]>)
+    .then((res) => res.text())
+    .then(parseStaticNavs)
     .then((data) => {
       navs.set(data)
       return data
