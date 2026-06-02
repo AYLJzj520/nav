@@ -5,5 +5,11 @@
   #root
 ></div>
 <ng-template #other>
-  <img class="adsimg" [src]="data['src']" draggable="false" />
+  <img
+    class="adsimg"
+    [src]="data['src']"
+    draggable="false"
+    loading="lazy"
+    decoding="async"
+  />
 </ng-template>

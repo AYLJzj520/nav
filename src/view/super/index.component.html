@@ -69,7 +69,13 @@
           trackBy: commonService.trackByItem
         "
       >
-        <img *ngIf="item.icon" class="sideicon" [src]="item.icon" />
+        <img
+          *ngIf="item.icon"
+          class="sideicon"
+          [src]="item.icon"
+          loading="lazy"
+          decoding="async"
+        />
         <span class="ellipsis">{{ item.title }}</span>
       </div>
     </div>
