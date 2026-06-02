@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core'
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  provideZoneChangeDetection,
+} from '@angular/core'
 import { registerLocaleData } from '@angular/common'
 import zh from '@angular/common/locales/zh'
 import { provideRouter, withHashLocation } from '@angular/router'
@@ -27,6 +31,7 @@ import config from '../../nav.config.json'
 import { provideServiceWorker } from '@angular/service-worker'
 import { isMobile } from 'src/utils'
 import { unregisterServiceWorkers } from 'src/utils/sw'
+import { NzModalModule } from 'ng-zorro-antd/modal'
 
 registerLocaleData(zh)
 
@@ -63,6 +68,7 @@ export const appConfig: ApplicationConfig = {
       ? provideRouter(routes, withHashLocation())
       : provideRouter(routes),
     provideAnimations(),
+    importProvidersFrom(NzModalModule),
     { provide: NZ_I18N, useValue: zh_CN },
     provideServiceWorker('ngsw-worker.js', {
       enabled: pwaEnable,
