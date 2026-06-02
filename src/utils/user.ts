@@ -1,10 +1,13 @@
 // 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
 // Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
-import localforage from 'localforage'
 import { STORAGE_KEY_MAP } from 'src/constants'
 import { ActionType } from 'src/types'
 import type { ISettings } from 'src/types'
+
+function getLocalforage() {
+  return import('localforage').then((module) => module.default)
+}
 
 export function getToken() {
   return globalThis.localStorage?.getItem(STORAGE_KEY_MAP.TOKEN) || ''
@@ -39,7 +42,9 @@ export function setImageToken(token: string) {
 }
 
 export function removeWebsite() {
-  return localforage.removeItem(STORAGE_KEY_MAP.WEBSITE)
+  return getLocalforage().then((localforage) =>
+    localforage.removeItem(STORAGE_KEY_MAP.WEBSITE),
+  )
 }
 
 export function userLogout() {
@@ -48,7 +53,7 @@ export function userLogout() {
     STORAGE_KEY_MAP.IMAGE_TOKEN,
     STORAGE_KEY_MAP.WEBSITE,
   ]
-  localforage.clear()
+  getLocalforage().then((localforage) => localforage.clear())
   Array.from({ length: globalThis.localStorage.length }, (_, i) => {
     return globalThis.localStorage.key(i)
   }).forEach((key) => {

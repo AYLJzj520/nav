@@ -2,12 +2,12 @@
 // Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
 import { signal, computed } from '@angular/core'
-import dbJson from '../../data/db.json'
 import searchJson from '../../data/search.json'
 import settingsJson from '../../data/settings.json'
 import tagJson from '../../data/tag.json'
 import internalJson from '../../data/internal.json'
 import componentJson from '../../data/component.json'
+import { DB_PATH } from 'src/constants'
 import type {
   ISettings,
   ISearchProps,
@@ -43,9 +43,29 @@ export const tagMap = computed<ITagProp>(() => {
 
 export const internal = signal<InternalProps>(internalJson)
 
-export const navs = signal<INavProps[]>(
-  isSelfDevelop ? [] : (dbJson as INavProps[]),
-)
+export const navs = signal<INavProps[]>([])
+
+let staticNavsPromise: Promise<INavProps[]> | null = null
+
+export function loadStaticNavs(): Promise<INavProps[]> {
+  if (isSelfDevelop) {
+    return Promise.resolve([])
+  }
+  if (navs().length) {
+    return Promise.resolve(navs())
+  }
+  staticNavsPromise ||= fetch(DB_PATH)
+    .then((res) => res.json() as Promise<INavProps[]>)
+    .then((data) => {
+      navs.set(data)
+      return data
+    })
+    .catch(() => {
+      staticNavsPromise = null
+      return []
+    })
+  return staticNavsPromise
+}
 
 export const component = signal<IComponentProps>(
   isSelfDevelop ? { zoom: 1, components: [] } : componentJson,

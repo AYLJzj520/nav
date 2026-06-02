@@ -8,9 +8,11 @@
 
     <router-outlet></router-outlet>
 
-    <app-create-web />
-    <app-delete-modal />
-    <app-move-web *ngIf="isLogin" />
-    <edit-class *ngIf="isLogin" />
+    @defer (on idle) {
+      <app-create-web />
+      <app-delete-modal />
+      <app-move-web *ngIf="isLogin" />
+      <edit-class *ngIf="isLogin" />
+    }
   </div>
 </ng-template>

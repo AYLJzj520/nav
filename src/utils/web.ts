@@ -2,17 +2,20 @@
 // Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
 import event from 'src/utils/mitt'
-import localforage from 'localforage'
 import navConfig from '../../nav.config.json'
 import { updateFileContent } from 'src/api'
 import { isLogin } from './user'
 import { IWebProps, INavProps } from '../types'
-import { navs } from 'src/store'
+import { loadStaticNavs, navs } from 'src/store'
 import { STORAGE_KEY_MAP, DB_PATH } from 'src/constants'
 import { isSelfDevelop } from './utils'
 import { queryString, getClassById } from './index'
 import { $t } from 'src/locale'
 import { filterLoginData, dfsNavs } from './pureUtils'
+
+function getLocalforage() {
+  return import('localforage').then((module) => module.default)
+}
 
 export async function getNavs() {
   if (isSelfDevelop) {
@@ -23,7 +26,7 @@ export async function getNavs() {
     event.emit('WEB_FINISH')
     window.__FINISHED__ = true
   }
-  const data = filterLoginData(navs(), isLogin)
+  const data = filterLoginData(await loadStaticNavs(), isLogin)
   if (!isLogin) {
     return finish(data)
   }
@@ -43,7 +46,9 @@ export async function getNavs() {
       STORAGE_KEY_MAP.DATE_TIME,
       navConfig.datetime,
     )
-    localforage.removeItem(STORAGE_KEY_MAP.WEBSITE)
+    getLocalforage().then((localforage) =>
+      localforage.removeItem(STORAGE_KEY_MAP.WEBSITE),
+    )
     finish(data)
     if (isLogin) {
       setTimeout(() => {
@@ -62,7 +67,7 @@ export async function getNavs() {
 
   try {
     const navsData: any =
-      (await localforage.getItem(STORAGE_KEY_MAP.WEBSITE)) || data
+      (await (await getLocalforage()).getItem(STORAGE_KEY_MAP.WEBSITE)) || data
     finish(navsData)
   } catch {
     finish(data)
@@ -76,7 +81,9 @@ export function setNavs(navs: INavProps[]): Promise<any> {
       path: DB_PATH,
     })
   }
-  return localforage.setItem(STORAGE_KEY_MAP.WEBSITE, navs)
+  return getLocalforage().then((localforage) =>
+    localforage.setItem(STORAGE_KEY_MAP.WEBSITE, navs),
+  )
 }
 
 export function toggleCollapseAll(navs: INavProps[]): boolean {

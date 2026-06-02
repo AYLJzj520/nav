@@ -36,6 +36,11 @@
               "src/assets",
               {
                 "glob": "**/*",
+                "input": "data",
+                "output": "data"
+              },
+              {
+                "glob": "**/*",
                 "input": "public"
               }
             ],
@@ -90,6 +95,11 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
+              {
+                "glob": "**/*",
+                "input": "data",
+                "output": "data"
+              },
               {
                 "glob": "**/*",
                 "input": "public"
