@@ -261,6 +261,7 @@
             [src]="dataSource.img || dataSource.icon"
             draggable="false"
             loading="lazy"
+            decoding="async"
             *ngIf="!isError"
             (error)="isError = true"
           />

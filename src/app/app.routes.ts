@@ -1,45 +1,39 @@
 import { Routes } from '@angular/router'
-import LightComponent from 'src/view/light/index.component'
-import SuperComponent from 'src/view/super/index.component'
-import SimComponent from 'src/view/sim/index.component'
-import SideComponent from 'src/view/side/index.component'
-import ShortcutComponent from 'src/view/shortcut/index.component'
-import MobileComponent from 'src/view/mobile/index.component'
 import { isSelfDevelop } from 'src/utils/utils'
 import { getDefaultTheme } from 'src/utils'
 
 export const routes: Routes = [
   {
     path: 'sim',
-    component: SimComponent,
+    loadComponent: () => import('src/view/sim/index.component'),
     data: {},
   },
   {
     path: 'super',
-    component: SuperComponent,
+    loadComponent: () => import('src/view/super/index.component'),
     data: {},
   },
   {
     path: 'side',
-    component: SideComponent,
+    loadComponent: () => import('src/view/side/index.component'),
     data: {},
   },
   {
     path: 'shortcut',
-    component: ShortcutComponent,
+    loadComponent: () => import('src/view/shortcut/index.component'),
     data: {},
   },
 
   {
     path: 'light',
-    component: LightComponent,
+    loadComponent: () => import('src/view/light/index.component'),
     data: {
       data: {},
     },
   },
   {
     path: 'app',
-    component: MobileComponent,
+    loadComponent: () => import('src/view/mobile/index.component'),
     data: {},
   },
   {
