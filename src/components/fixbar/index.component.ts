@@ -4,7 +4,7 @@
 
 import { Component, Output, EventEmitter, Input } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { isDark as isDarkFn } from 'src/utils'
+import { hasDarkModeSetting, isDark as isDarkFn } from 'src/utils'
 import { NzModalService } from 'ng-zorro-antd/modal'
 import { NzMessageService } from 'ng-zorro-antd/message'
 import { isLogin } from 'src/utils/user'
@@ -42,6 +42,12 @@ export class FixbarComponent {
   readonly language = getLocale()
   readonly isLogin = isLogin
   private scrollSubscription: Subscription | null = null
+  private darkModeMediaQuery: MediaQueryList | null = null
+  private readonly darkModeListener = (event: MediaQueryListEvent) => {
+    if (!hasDarkModeSetting()) {
+      this.setDarkMode(event.matches, true)
+    }
+  }
   readonly isSelfDevelop = isSelfDevelop
   readonly isPwaMode = isPwaMode() && window.__PWA_ENABLE__
   isDark: boolean = isDarkFn()
@@ -82,9 +88,8 @@ export class FixbarComponent {
     private modal: NzModalService,
     private router: Router,
   ) {
-    if (this.isDark) {
-      addDark()
-    }
+    this.setDarkMode(this.isDark)
+    this.setupAutoDarkMode()
 
     const url = this.router.url.split('?')[0]
     const defaultTheme = this.settings.theme?.toLowerCase?.()
@@ -144,6 +149,10 @@ export class FixbarComponent {
       this.scrollSubscription.unsubscribe()
       this.scrollSubscription = null
     }
+    this.darkModeMediaQuery?.removeEventListener(
+      'change',
+      this.darkModeListener,
+    )
   }
 
   toggleTheme(theme: any) {
@@ -176,12 +185,24 @@ export class FixbarComponent {
   }
 
   toggleMode() {
-    this.isDark = !this.isDark
-    mitt.emit('EVENT_DARK', this.isDark)
+    this.setDarkMode(!this.isDark, true)
     window.localStorage.setItem(
       STORAGE_KEY_MAP.IS_DARK,
       String(Number(this.isDark)),
     )
+  }
+
+  private setupAutoDarkMode() {
+    this.darkModeMediaQuery =
+      window.matchMedia?.('(prefers-color-scheme: dark)') || null
+    this.darkModeMediaQuery?.addEventListener('change', this.darkModeListener)
+  }
+
+  private setDarkMode(isDark: boolean, emitEvent = false) {
+    this.isDark = isDark
+    if (emitEvent) {
+      mitt.emit('EVENT_DARK', this.isDark)
+    }
 
     if (this.isDark) {
       addDark()

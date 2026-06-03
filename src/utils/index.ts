@@ -331,15 +331,18 @@ export function setDefaultSearchEngine(engine: ISearchItemProps) {
   )
 }
 
+export function hasDarkModeSetting(): boolean {
+  return window.localStorage.getItem(STORAGE_KEY_MAP.IS_DARK) !== null
+}
+
+export function getSystemDarkMode(): boolean {
+  return !!window?.matchMedia?.('(prefers-color-scheme: dark)')?.matches
+}
+
 export function isDark(): boolean {
   const storageVal = window.localStorage.getItem(STORAGE_KEY_MAP.IS_DARK)
-  const darkMode = window?.matchMedia?.('(prefers-color-scheme: dark)')?.matches
 
-  if (!storageVal && darkMode) {
-    return darkMode
-  }
-
-  return Boolean(Number(storageVal))
+  return storageVal === null ? getSystemDarkMode() : Boolean(Number(storageVal))
 }
 
 export async function copyText(text: string): Promise<boolean> {

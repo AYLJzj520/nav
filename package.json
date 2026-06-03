@@ -32,6 +32,7 @@
     "@angular/platform-browser-dynamic": "^20.2.1",
     "@angular/router": "^20.2.1",
     "@angular/service-worker": "^20.2.1",
+    "@ant-design/icons-angular": "^20.0.0",
     "axios": "^1.11.0",
     "chrome-finder": "^1.0.7",
     "cron": "^4.3.3",
